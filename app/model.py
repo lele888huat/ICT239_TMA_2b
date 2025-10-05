@@ -1,5 +1,5 @@
 from app import db
-from books import all_books
+from app.books import all_books
 
 class Book(db.Document):
     """
@@ -9,13 +9,13 @@ class Book(db.Document):
     title = db.StringField(required=True, unique=True)
     category = db.StringField(required=True)
     url = db.StringField()
-    description = db.StringField()
+    description = db.ListField(db.StringField()) 
     authors = db.ListField(db.StringField(), required=True)
     pages = db.IntField()
-    available = db.BooleanField(default=True)
-    copies = db.IntField(default=1)
+    available = db.IntField(default=0) 
+    copies = db.IntField(default=0)
 
-    meta = {'collection': 'books'}  # optional, sets the MongoDB collection name
+    meta = {'collection': 'books'}
 
     # --- Class Methods ---
     @classmethod
@@ -24,18 +24,23 @@ class Book(db.Document):
         Populate the collection from all_books if empty.
         """
         if cls.objects.count() == 0:
+            print("Book collection is empty. Initializing from all_books...")
             for book_data in all_books:
+                # The data structure in books.py already matches the model,
+                # except for the default values which MongoEngine handles.
                 cls(**book_data).save()
-            print("✅ Book collection initialized from all_books.")
+            print(f"✅ Book collection initialized from all_books.")
         else:
-            print("ℹ️ Book collection already populated.")
+            print(f"ℹ️ Book collection already populated with {cls.objects.count()} documents. Skipping initialization.")
+
 
     @classmethod
     def get_all_books(cls):
         """
-        Retrieve all books from MongoDB.
+        Retrieve all books from MongoDB, sorted by title (Required for Q2(a) effect).
         """
-        return list(cls.objects.as_pymongo())
+        # --- CORRECTION 3: Added sorting by title ---
+        return list(cls.objects.order_by('title').as_pymongo())
 
     @classmethod
     def find_by_title(cls, title):
@@ -48,8 +53,11 @@ class Book(db.Document):
     @classmethod
     def find_by_category(cls, category):
         """
-        Retrieve books filtered by category (or all if category='All').
+        Retrieve books filtered by category (or all if category='All'), sorted by title.
         """
         if category == "All":
             return cls.get_all_books()
-        return list(cls.objects(category=category).as_pymongo())
+            
+        #sorting by title 
+        return list(cls.objects(category=category).order_by('title').as_pymongo())
+

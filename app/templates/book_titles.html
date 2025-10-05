@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Book Titles{% endblock %}
+
+{% block page_heading %}
+Book Titles
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="book-card p-2 d-flex justify-content-between align-items-center mb-1"
+            style="background-color: #d4edda;">
+
+            <div class="mr-3 book-count-text">
+                Number of titles: {{ all_books|length }}
+            </div>
+
+            <form action="{{ url_for('book_titles') }}" method="GET" class="form-inline align-items-center">
+
+                <!-- WRAPPING THE FILTER ELEMENTS IN A RESPONSIVE FLEX CONTAINER -->
+                <!-- d-flex: always flex (needed for mobile) -->
+                <!-- flex-column: stack vertically on mobile (default) -->
+                <!-- flex-sm-row: stack horizontally from 'sm' breakpoint (>= 576px) -->
+                <div class="d-flex flex-column flex-sm-row align-items-sm-center">
+                    <div class="form-group d-flex align-items-center me-sm-3 mb-1 mb-sm-0">
+                        <label for="category-select" class="me-2 text-nowrap">Category </label>
+                        <select class="form-control form-control-sm" id="category-select" name="category">
+                            <option value="All" {% if current_category=='All' or not current_category %}selected{% endif %}>
+                                All</option>
+                            <option value="Children" {% if current_category=='Children' %}selected{% endif %}>Children
+                            </option>
+                            <option value="Teens" {% if current_category=='Teens' %}selected{% endif %}>Teens</option>
+                            <option value="Adult" {% if current_category=='Adult' %}selected{% endif %}>Adults</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-sm btn-primary w-100 ms-auto">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    {% for book in all_books %}
+    <div class="col-lg-12">
+        <div class="book-card p-3 mb-2">
+            <div class="row no-gutters align-items-start">
+                <!-- IMAGE SECTION -->
+                <div class="col-12 col-md-2 px-0 text-center">
+                    {% if book.url %}
+                    <img src="{{ book.url }}" alt="{{ book.title }}" class="img-fluid book-list-cover">
+                    {% else %}
+                    <div class="no-image-placeholder d-flex flex-column align-items-center justify-content-center w-100">
+                        <i class="fas fa-book fa-2x text-muted"></i>
+                        <p class="mt-2 mb-0 text-muted small">Image NA</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- DETAILS SECTION -->
+                <div class="col-12 col-md-10 d-flex flex-column h-100">
+                    <h4 class="mb-0 book-title-header font-weight-normal">{{ book.title }}</h4>
+
+                    <h4 class="book-title-header mb-2 font-weight-normal">
+                        By {{ book.authors|join(', ') }}
+                    </h4>
+
+                    <p class="mb-1 small">
+                        Category: {{ book.category }}
+                        {% for genre in book.genres %}
+                        , {{ genre }}
+                        {% endfor %}
+                    </p>
+
+                    <p class="mb-2 small">Pages: {{ book.pages }}</p>
+
+                    {% set description_list = book.description %}
+                    {% if description_list|length > 1 %}
+                    <p class="text-muted flex-grow-1">
+                        {{ description_list[0] }}
+                        {% if description_list|length > 2 %}<br>{% endif %}
+                        <br>{{ description_list[-1] }}
+                    </p>
+                    {% else %}
+                    <p class="text-muted flex-grow-1">{{ book.description[0] }}</p>
+                    {% endif %}
+
+                    <div class="mt-2 text-right mt-auto">
+                        <a href="{{ url_for('book_details', book_title=book.title) }}" class="btn btn-sm btn-info">
+                            More Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
