@@ -91,7 +91,6 @@ body {
 /* ================================
   Content Styling (Desktop: MD and Up)
   ================================ */
-/* Default (Desktop) positioning */
 #content {
     margin-left: 200px; 
     width: 100%;
@@ -102,7 +101,6 @@ body {
 
 .navbar {
     position: fixed;
-    /* desktop width */
     width: calc(100vw - 200px); 
     left: 200px; 
     top: 0;
@@ -147,9 +145,6 @@ body {
     overflow: hidden;
 }
 
-/* ================================
-  Default Book Image Styling
-  ================================ */
 .book-card img,
 .book-card .no-image-placeholder {
     width: 100px; 
@@ -160,7 +155,10 @@ body {
     border-radius: 0.25rem;
 }
 
-/* Small / Medium (≥576px & ≤991.98px) - Book Titles Page Responsive */
+/* ================================
+  Responsive Adjustments
+  ================================ */
+/* Small / Medium (≥576px & ≤991.98px) */
 @media (min-width: 576px) and (max-width: 991.98px) {
     .book-card .row {
         display: flex !important;
@@ -168,7 +166,6 @@ body {
         align-items: flex-start;
     }
 
-    /* Image Column: Fix width/max-width to 120px */
     .book-card .row > div:first-child {
         flex: 0 0 120px !important;
         max-width: 120px !important;
@@ -176,7 +173,6 @@ body {
         text-align: center;
     }
 
-    /* Text Column (Fluid width) */
     .book-card .row > div:last-child {
         flex: 1 1 auto !important;
         min-width: 0; 
@@ -185,7 +181,6 @@ body {
         overflow-wrap: break-word;
     }
 
-    /* Image Tag: Explicitly set fixed height/width */
     .book-card img,
     .book-card .no-image-placeholder {
         width: 100px !important;
@@ -198,7 +193,7 @@ body {
     }
 }
 
-/* Extra Small (<576px) - Book Titles Page Responsive */
+/* Extra Small (<576px) */
 @media (max-width: 575px) {
     .book-card .row {
         flex-direction: column !important;
@@ -206,7 +201,6 @@ body {
         margin-right: 0 !important;
     }
 
-    /* Image column full width, center aligned */
     .book-card .row > div:first-child {
         padding: 15px !important;
         padding-bottom: 0 !important;
@@ -215,7 +209,6 @@ body {
         flex: 0 0 100% !important;
     }
 
-    /* Book cover styling */
     .book-card img,
     .book-card .no-image-placeholder {
         width: 100% !important;
@@ -227,7 +220,6 @@ body {
         padding: 0 !important;
     }
 
-    /* Text column full width below image */
     .book-card .row > div:last-child {
         padding: 15px !important;
         width: 100% !important;
@@ -240,17 +232,12 @@ body {
   Responsive: Hamburger Menu & Sidebar (<768px)
   ================================ */
 @media (max-width: 768px) {
-    /* ------------------------------------
-       HAMBURGER ICON STYLING (The Fix)
-       ------------------------------------ */
     #sidebar-label {
         position: fixed;
         top: 10px; 
         right: 10px; 
         z-index: 1002; 
         transition: right 0.3s; 
-        
-        /* New Styling to create the three-bar look */
         width: 40px;
         height: 35px;
         background-color: white; 
@@ -264,31 +251,25 @@ body {
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); 
     }
 
-    /* Styles for the individual bars */
     #sidebar-label span {
         display: block;
         height: 3px; 
         width: 100%;
-        background-color: #6c757d; /* Grey color for the bars */
+        background-color: #6c757d; 
         border-radius: 2px;
         transition: all 0.3s;
     }
-    /* ------------------------------------ */
 
-
-    /* Content fills full width when sidebar is hidden */
     #content {
         margin-left: 0; 
         padding-left: 15px; 
         padding-right: 15px; 
     }
 
-    /* Hide desktop navbar initially */
     .navbar {
         display: none !important; 
     }
 
-    /* Sidebar collapses vertically on mobile */
     #sidebar {
         min-width: 100vw;
         max-width: none;
@@ -302,45 +283,83 @@ body {
         transition: height 0.3s ease; 
     }
 
-    /* Adjust main content padding - this is the base offset for the mobile view */
     .main-content-area {
         padding-top: 50px;
     }
 
-    /* Hide page heading initially (it will appear in the second fixed bar) */
     #content .navbar h4 {
         display: none;
     }
 
-    /* Sidebar expanded when checkbox is checked */
     #sidebar-toggle:checked ~ .wrapper #sidebar {
         height: 160px; 
         box-shadow: 0 4px 6px rgba(0,0,0,0.3); 
         padding-bottom: 10px; 
     }
 
-    /* Show navbar below expanded sidebar */
     #sidebar-toggle:checked ~ .wrapper #content .navbar {
         display: flex !important; 
         left: 0; 
         width: 100vw;
-        top: 160px; /* Position below the expanded sidebar */
+        top: 160px; 
         transition: top 0.3s ease;
     }
 
-    /* Content margin reset (already 0, but good for clarity) */
     #sidebar-toggle:checked ~ .wrapper #content {
         margin-left: 0; 
     }
 
-    /* Show heading when sidebar expanded */
     #sidebar-toggle:checked ~ .wrapper #content .navbar h4 {
         display: block; 
     }
 
-    /* Push main content below the fixed navbar AND the expanded sidebar */
     #sidebar-toggle:checked ~ .wrapper #content .main-content-area {
-        /* 160px (sidebar height) + 55px (navbar height) = 215px */
         padding-top: 215px; 
     }
+}
+
+/* ================================
+  CUSTOM CHANGES
+  ================================ */
+/* --------------------------
+   Sidebar Header / User Info / For LOGIN/REGISTER changes
+   -------------------------- */
+#sidebar .sidebar-header {
+    padding: 10px 10px 0;  /* reduced top padding */
+    margin-bottom: 10px;   /* reduced bottom margin */
+}
+
+#sidebar .sidebar-header::after {
+    margin: 5px 10px 0;    /* reduced space below top line */
+}
+
+/* User info section */
+.user-info {
+    display: flex; /* keep flex for alignment */
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 5px 0 12px 0; /* top 5px, bottom 12px */
+    margin: 0 10px; /* same left/right as top line */
+    position: relative; /* needed for ::after positioning */
+}
+
+/* Bottom line matches top line */
+.user-info::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 10px;  /* same as top line margins */
+    right: 10px; /* same as top line margins */
+    border-bottom: 1px solid white;
+}
+
+.user-info i {
+    color: #ffffff;
+}
+
+.user-info p {
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 0; 
 }
