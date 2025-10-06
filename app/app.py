@@ -1,7 +1,8 @@
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, flash,redirect, url_for, session
 from app import create_app, db 
-from app.model import Book
+from app.model import Book, User
+from app.forms import RegistrationForm, LoginForm
 
 # Create Flask app and initialize MongoDB
 app = create_app()
@@ -56,6 +57,68 @@ def book_details(book_title):
         'book_details.html',
         book=the_book
     )
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegistrationForm()
+    
+    if form.validate_on_submit():
+        # Check if the email already exists
+        if User.objects(email=form.email.data).first():
+            flash(f"Email {form.email.data} already registered!", "danger")
+            return render_template("register.html", form=form)
+        
+        # Save user to MongoDB
+        new_user = User(
+            email=form.email.data,
+            password=form.password.data,  # optional: hash this
+            name=form.name.data,
+        )
+        new_user.save()
+        flash(f"Registration successful for {form.email.data}!", "success")
+        return redirect(url_for('book_titles'))
+
+    return render_template('register.html', form=form)
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        # Check if user exists
+        user = User.objects(email=form.email.data).first()
+        if not user:
+            flash("Email not registered!", "danger")
+            return render_template("login.html", form=form)
+
+        # Check password
+        if user.password != form.password.data:
+            flash("Incorrect password!", "danger")
+            return render_template("login.html", form=form)
+        
+        # Login successful: set session variables
+        session['user_email'] = user.email
+        session['user_name'] = user.name
+        
+        # Remember Me
+        if form.remember.data:  # Remember Me checked
+            session.permanent = True
+        else:
+            session.permanent = False  # Log out when browser closes
+
+        flash(f"Welcome {user.name}!", "success")
+        return redirect(url_for('book_titles'))
+
+    return render_template("login.html", form=form)
+
+
+
+@app.route('/logout')
+def logout():
+    session.pop('user_email', None)
+    session.pop('user_name', None)
+    flash("You have been logged out.", "info")
+    return redirect(url_for('book_titles'))
 
 
 if __name__ == '__main__':

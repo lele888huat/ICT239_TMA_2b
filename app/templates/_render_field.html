@@ -1,0 +1,13 @@
+{% macro render_field(field, type='text', placeholder='', id='') %}
+<div class="form-group">
+    <label for="{{ id or field.name }}">
+        <h5>{{ field.label.text.capitalize() }}</h5>
+    </label>
+    {{ field(class_='form-control', type=type, placeholder=placeholder, id=id or field.name)|safe }}
+    <ul> 
+        {% for error in field.errors %}
+        <li style="color:red;">{{ error }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endmacro %}

@@ -60,4 +60,19 @@ class Book(db.Document):
             
         #sorting by title 
         return list(cls.objects(category=category).order_by('title').as_pymongo())
+    
+
+
+# ----------------------------------------------------------------------
+# --- NEW USER MODEL (Database Model) ---
+# ----------------------------------------------------------------------
+class User(db.Document):
+    """
+    MongoEngine model for users (librarians/members).
+    """
+    email = db.StringField(required=True, unique=True)
+    password = db.StringField(required=True) 
+    name = db.StringField(required=True)
+
+    meta = {'collection': 'users'}
 
