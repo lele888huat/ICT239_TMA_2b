@@ -329,45 +329,46 @@ body {
    -------------------------- */
 #sidebar .sidebar-header {
     padding: 10px 10px 0;  /* reduced top padding */
-    margin-bottom: 10px;   /* reduced bottom margin */
+    margin-bottom: 5px;   /* reduced bottom margin */
 }
 
 #sidebar .sidebar-header::after {
     margin: 5px 10px 0;    /* reduced space below top line */
 }
 
-/* User info section */
+
+/* --------------------------
+   Sidebar User Info aligned with links
+   -------------------------- */
 .user-info {
-    display: flex; /* keep flex for alignment */
+    display: flex;
     align-items: center;
-    justify-content: flex-start; /* align items to left */
-    gap: 8px;
-    padding: 5px 0 12px 0; /* top 5px, bottom 12px */
-    margin: 0 10px; /* same left/right as top line */
-    position: relative; /* needed for ::after positioning */
+    justify-content: flex-start; /* left-align */
+    gap: 10px;                   /* spacing between icon & name */
+    padding: 10px 20px 15px 20px; /* increased bottom padding */
+    margin: 0;
     text-align: left;
+    color: #fff;
+    position: relative;          /* needed for absolute positioning of ::after */
 }
-
-
-/* Bottom line matches top line */
-.user-info::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 10px;  /* same as top line margins */
-    right: 10px; /* same as top line margins */
-    border-bottom: 1px solid white;
-}
-
 .user-info i {
     color: #ffffff;
+    font-size: 1.2em;  /* optional, matches link icon size */
 }
 
-.user-info p {
-    font-size: 1rem;
-    font-weight: 500;
-    margin: 0; 
+.user-info span {
+    font-size: 1.1em;  /* matches sidebar link text */
+    font-weight: normal;
 }
 
+/* remove the bottom line under user-info if not needed */
+.user-info::after {
+    content: "";
+    position: absolute;          /* position relative to .user-info */
+    bottom: 0;                   /* stick to the bottom of the user-info div */
+    left: 20px;                  /* same left padding as links */
+    right: 20px;                 /* same right padding as links */
+    border-bottom: 1px solid white;
+}
 
 
