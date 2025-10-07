@@ -15,10 +15,10 @@
 </head>
 
 <body>
-    {# 1. HIDDEN CHECKBOX: The state controller. #}
+    <!-- Sidebar toggle checkbox -->
     <input type="checkbox" id="sidebar-toggle" hidden>
 
-    {# 2. HAMBURGER LABEL (FIXED POSITION): Uses pure CSS bars (spans) for the icon. #}
+    <!-- Hamburger icon -->
     <label for="sidebar-toggle" id="sidebar-label" class="d-md-none">
         <span></span>
         <span></span>
@@ -30,14 +30,13 @@
             <div class="sidebar-header">
                 <h3>SG Library</h3>
             </div>
-                        
+            
             <ul class="list-unstyled components">
-                {% if session.get('user_email') %}
-                <div class="user-info d-flex align-items-center justify-content-center text-white mb-3">
-                    <i class="fas fa-user-circle fa-lg me-2"></i>
-                    <span>{{ session.get('user_name', 'User') }}</span>
-                </div>
-
+                {% if current_user.is_authenticated %}
+                    <div class="user-info d-flex align-items-center justify-content-center text-white mb-3">
+                        <i class="fas fa-user-circle fa-lg me-2"></i>
+                        <span>{{ current_user.name }}</span>
+                    </div>
                 {% endif %}
 
                 <li class="{% if request.path == url_for('book_titles') %}active{% endif %}">
@@ -46,7 +45,7 @@
                     </a>
                 </li>
 
-                {% if not session.get('user_email') %}
+                {% if not current_user.is_authenticated %}
                     <li class="{% if request.path == url_for('login') %}active{% endif %}">
                         <a href="{{ url_for('login') }}">
                             <i class="fas fa-sign-in-alt"></i> Login
@@ -65,54 +64,17 @@
                     </li>
                 {% endif %}
             </ul>
-
-
-<!-- 
-        
-            <ul class="list-unstyled components">
-                <li class="{% if request.path == url_for('book_titles') %}active{% endif %}">
-                    <a href="{{ url_for('book_titles') }}">
-                        <i class="fas fa-book"></i> Book Titles
-                    </a>
-                </li>
-                <li class="{% if request.path == url_for('login') %}active{% endif %}">
-                    <a href="{{ url_for('login') }}">
-                        <i class="fas fa-sign-in-alt"></i> Login
-                    </a>
-                </li>
-                <li class="{% if request.path == url_for('register') %}active{% endif %}">
-                    <a href="{{ url_for('register') }}">
-                        <i class="fas fa-user-plus"></i> Register
-                    </a>
-                </li>
-            </ul> -->
-
         </nav>
 
         <div id="content">
-            {# Fixed Top Bar for Page Heading #}
+            <!-- Fixed Top Bar -->
             <nav class="navbar navbar-expand-lg custom-header-bg fixed-top shadow-sm">
                 <div class="container-fluid d-flex justify-content-start align-items-center">
-                    {# 3. Page Heading #}
                     <h4 class="mb-0">{% block page_heading %}{% endblock %}</h4>
                 </div>
             </nav>
 
-            <!-- {# ✅ Flash message section (global, no JS) #}
-            {% with messages = get_flashed_messages(with_categories=true) %}
-              {% if messages %}
-                <div class="container mt-4 mb-0 pt-1">
-
-                  {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}" role="alert">
-                      {{ message }}
-                    </div>
-                  {% endfor %}
-                </div>
-              {% endif %}
-            {% endwith %} -->
-
-            {# Main Content Area: Padding-top offsets the fixed navbar #}
+            <!-- Main Content Area -->
             <div class="main-content-area">
                 {% block content %}
                 {% endblock %}

@@ -3,15 +3,30 @@ from flask import Flask, render_template, request, flash,redirect, url_for, sess
 from app import create_app, db 
 from app.model import Book, User
 from app.forms import RegistrationForm, LoginForm
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
+
 
 # Create Flask app and initialize MongoDB
 app = create_app()
+
+
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'  
+login_manager.login_message = "Please login/register to continue!"
+login_manager.login_message_category = "warning"
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.objects(pk=user_id).first()
 
 # Ensure Book collection is populated when app starts
 with app.app_context():
     Book.initialize_collection()
 
-##Code to clear db - for testing purposes only
+#Code to clear db - for testing purposes only
 # @app.route("/clear_db")
 # def clear_books():
 #     # Only for development/testing!
@@ -63,49 +78,37 @@ def register():
     form = RegistrationForm()
     
     if form.validate_on_submit():
-        # Check if the email already exists
         if User.objects(email=form.email.data).first():
             flash(f"Email {form.email.data} already registered!", "danger")
             return render_template("register.html", form=form)
         
-        # Save user to MongoDB
         new_user = User(
             email=form.email.data,
-            password=form.password.data,  # optional: hash this
-            name=form.name.data,
+            name=form.name.data
         )
+        new_user.set_password(form.password.data)
         new_user.save()
         flash(f"Registration successful for {form.email.data}!", "success")
-        return redirect(url_for('book_titles'))
+        return redirect(url_for('login'))
 
     return render_template('register.html', form=form)
+
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        # Check if user exists
         user = User.objects(email=form.email.data).first()
         if not user:
             flash("Email not registered!", "danger")
             return render_template("login.html", form=form)
-
-        # Check password
-        if user.password != form.password.data:
+        
+        if not user.check_password(form.password.data):
             flash("Incorrect password!", "danger")
             return render_template("login.html", form=form)
         
-        # Login successful: set session variables
-        session['user_email'] = user.email
-        session['user_name'] = user.name
-        
-        # Remember Me
-        if form.remember.data:  # Remember Me checked
-            session.permanent = True
-        else:
-            session.permanent = False  # Log out when browser closes
-
+        login_user(user, remember=form.remember.data)
         flash(f"Welcome {user.name}!", "success")
         return redirect(url_for('book_titles'))
 
@@ -114,9 +117,9 @@ def login():
 
 
 @app.route('/logout')
+@login_required
 def logout():
-    session.pop('user_email', None)
-    session.pop('user_name', None)
+    logout_user()
     flash("You have been logged out.", "info")
     return redirect(url_for('book_titles'))
 

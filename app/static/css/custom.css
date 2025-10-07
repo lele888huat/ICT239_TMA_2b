@@ -80,9 +80,12 @@ body {
     color: #fff; 
     text-decoration: none;
     transition: all 0.3s;
-    text-align: center;
+    text-align: left;
+    justify-content: flex-start; /* move icon + text to left */
+    padding-left: 20px; /* control left distance */
     font-weight: normal; 
 }
+
 
 #sidebar ul li a:hover {
     background: rgba(255,255,255,0.2);
@@ -337,12 +340,14 @@ body {
 .user-info {
     display: flex; /* keep flex for alignment */
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start; /* align items to left */
     gap: 8px;
     padding: 5px 0 12px 0; /* top 5px, bottom 12px */
     margin: 0 10px; /* same left/right as top line */
     position: relative; /* needed for ::after positioning */
+    text-align: left;
 }
+
 
 /* Bottom line matches top line */
 .user-info::after {
@@ -363,3 +368,6 @@ body {
     font-weight: 500;
     margin: 0; 
 }
+
+
+

@@ -1,5 +1,8 @@
 from app import db
 from app.books import all_books
+from flask_mongoengine import Document
+from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
 
 class Book(db.Document):
     """
@@ -66,13 +69,19 @@ class Book(db.Document):
 # ----------------------------------------------------------------------
 # --- NEW USER MODEL (Database Model) ---
 # ----------------------------------------------------------------------
-class User(db.Document):
-    """
-    MongoEngine model for users (librarians/members).
-    """
+
+class User(UserMixin, Document):
     email = db.StringField(required=True, unique=True)
-    password = db.StringField(required=True) 
+    password = db.StringField(required=True)
     name = db.StringField(required=True)
 
-    meta = {'collection': 'users'}
+    def set_password(self, password):
+        self.password = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password, password)
+
+    # Flask-Login needs this to get user by ID
+    def get_id(self):
+        return str(self.pk)
 
