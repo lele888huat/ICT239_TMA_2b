@@ -1,38 +1,38 @@
 /* ================================
-  Layout / Global Styling
-  ================================ */
+   Layout / Global Styling
+   ================================ */
 
-/* Ensures no horizontal scrolling due to fixed elements */
+/* Prevent horizontal scrolling */
 html, body {
     width: 100%;
     overflow-x: hidden; 
 }
 
-/* Overall background color */
+/* Background */
 body {
     background-color: #f0f0f0; 
 }
 
-/* Wrapper for Flexbox layout */
+/* Flex wrapper */
 .wrapper { 
     display: flex; 
     align-items: stretch; 
 }
 
-/* Custom CSS for header background and width adjustment */
+/* Header background */
 .custom-header-bg {
     background-color: #a7d9b7 !important; 
 }
 
-/* Header Alignment Fix: Counteracts the left padding on #content */
+/* Header text alignment */
 #content .navbar h4 {
     margin-top: 0; 
     margin-bottom: 0;
 }
 
 /* ================================
-  Sidebar Styling (Desktop: MD and Up)
-  ================================ */
+   Sidebar Styling (Desktop ≥768px)
+   ================================ */
 #sidebar {
     min-width: 200px;
     max-width: 200px;
@@ -59,41 +59,40 @@ body {
 }
 
 #sidebar .sidebar-header {
-    padding: 20px 10px 0; 
+    padding: 10px 10px 0;  
     text-align: center;
     color: #fff;
     font-weight: normal; 
-    margin-bottom: 30px; 
+    margin-bottom: 5px;   
 }
 
 #sidebar .sidebar-header::after {
     content: "";
     display: block;
     border-bottom: 1px solid white;
-    margin: 15px 10px 0; 
+    margin: 5px 10px 0;    
 }
 
 #sidebar ul li a {
-    padding: 10px 20px; 
+    padding: 10px 20px;
     font-size: 1.1em;
     display: block;
-    color: #fff; 
+    color: #fff;
     text-decoration: none;
     transition: all 0.3s;
     text-align: left;
-    justify-content: flex-start; /* move icon + text to left */
-    padding-left: 20px; /* control left distance */
+    justify-content: flex-start;
+    padding-left: 20px;
     font-weight: normal; 
 }
-
 
 #sidebar ul li a:hover {
     background: rgba(255,255,255,0.2);
 }
 
 /* ================================
-  Content Styling (Desktop: MD and Up)
-  ================================ */
+   Content Styling (Desktop ≥768px)
+   ================================ */
 #content {
     margin-left: 200px; 
     width: 100%;
@@ -119,13 +118,14 @@ body {
 }
 
 /* ================================
-  Buttons and Text Colors
-  ================================ */
+   Buttons and Text Colors
+   ================================ */
 .btn-primary, .btn-info {
     color: #fff;
     background-color: #28a745; 
     border-color: #28a745;
 }
+
 .btn-primary:hover, .btn-info:hover {
     background-color: #1e7e34; 
     border-color: #1c7430;
@@ -139,8 +139,8 @@ body {
 }
 
 /* ================================
-  Book Card Base Styling
-  ================================ */
+   Book Card Base Styling
+   ================================ */
 .book-card {
     background-color: white;
     box-shadow: 0 0.5rem 1rem rgba(0,0,0,.05);
@@ -159,8 +159,8 @@ body {
 }
 
 /* ================================
-  Responsive Adjustments
-  ================================ */
+   Responsive Book Cards
+   ================================ */
 /* Small / Medium (≥576px & ≤991.98px) */
 @media (min-width: 576px) and (max-width: 991.98px) {
     .book-card .row {
@@ -168,14 +168,12 @@ body {
         flex-wrap: nowrap !important;
         align-items: flex-start;
     }
-
     .book-card .row > div:first-child {
         flex: 0 0 120px !important;
         max-width: 120px !important;
         padding: 15px 5px 15px 15px !important;
         text-align: center;
     }
-
     .book-card .row > div:last-child {
         flex: 1 1 auto !important;
         min-width: 0; 
@@ -183,13 +181,10 @@ body {
         text-align: left;
         overflow-wrap: break-word;
     }
-
     .book-card img,
     .book-card .no-image-placeholder {
         width: 100px !important;
-        max-width: 100px !important;
-        height: 150px !important; 
-        max-height: 150px;
+        height: 150px !important;
         margin: 0 auto !important;
         object-fit: contain !important;
         border-radius: 0.25rem;
@@ -203,7 +198,6 @@ body {
         margin-left: 0 !important;
         margin-right: 0 !important;
     }
-
     .book-card .row > div:first-child {
         padding: 15px !important;
         padding-bottom: 0 !important;
@@ -211,7 +205,6 @@ body {
         text-align: center;
         flex: 0 0 100% !important;
     }
-
     .book-card img,
     .book-card .no-image-placeholder {
         width: 100% !important;
@@ -222,7 +215,6 @@ body {
         border-radius: 0.35rem !important;
         padding: 0 !important;
     }
-
     .book-card .row > div:last-child {
         padding: 15px !important;
         width: 100% !important;
@@ -232,17 +224,19 @@ body {
 }
 
 /* ================================
-  Responsive: Hamburger Menu & Sidebar (<768px)
-  ================================ */
+   Responsive: Hamburger Menu & Sidebar (<768px)
+   ================================ */
 @media (max-width: 768px) {
+
+    /* Hamburger toggle */
     #sidebar-label {
         position: fixed;
         top: 10px; 
         right: 10px; 
         z-index: 1002; 
         transition: right 0.3s; 
-        width: 40px;
-        height: 35px;
+        width: 40px;   /* slightly bigger for more buttons */
+        height: 30px;
         background-color: white; 
         border: 1px solid #ddd;
         border-radius: 5px;
@@ -294,10 +288,11 @@ body {
         display: none;
     }
 
+    /* Sidebar when hamburger clicked */
     #sidebar-toggle:checked ~ .wrapper #sidebar {
-        height: 160px; 
+        height: 200px; 
         box-shadow: 0 4px 6px rgba(0,0,0,0.3); 
-        padding-bottom: 10px; 
+        padding-bottom: 30px; 
     }
 
     #sidebar-toggle:checked ~ .wrapper #content .navbar {
@@ -322,53 +317,32 @@ body {
 }
 
 /* ================================
-  CUSTOM CHANGES
-  ================================ */
-/* --------------------------
-   Sidebar Header / User Info / For LOGIN/REGISTER changes
-   -------------------------- */
-#sidebar .sidebar-header {
-    padding: 10px 10px 0;  /* reduced top padding */
-    margin-bottom: 5px;   /* reduced bottom margin */
-}
-
-#sidebar .sidebar-header::after {
-    margin: 5px 10px 0;    /* reduced space below top line */
-}
-
-
-/* --------------------------
-   Sidebar User Info aligned with links
-   -------------------------- */
+   Sidebar User Info / Custom
+   ================================ */
 .user-info {
     display: flex;
     align-items: center;
-    justify-content: flex-start; /* left-align */
-    gap: 10px;                   /* spacing between icon & name */
-    padding: 10px 20px 15px 20px; /* increased bottom padding */
+    justify-content: flex-start;
+    gap: 10px;
+    padding: 10px 20px 15px 20px;
     margin: 0;
     text-align: left;
     color: #fff;
-    position: relative;          /* needed for absolute positioning of ::after */
+    position: relative;
 }
 .user-info i {
     color: #ffffff;
-    font-size: 1.2em;  /* optional, matches link icon size */
+    font-size: 1.2em;
 }
-
 .user-info span {
-    font-size: 1.1em;  /* matches sidebar link text */
+    font-size: 1.1em;
     font-weight: normal;
 }
-
-/* remove the bottom line under user-info if not needed */
 .user-info::after {
     content: "";
-    position: absolute;          /* position relative to .user-info */
-    bottom: 0;                   /* stick to the bottom of the user-info div */
-    left: 20px;                  /* same left padding as links */
-    right: 20px;                 /* same right padding as links */
+    position: absolute;
+    bottom: 0;
+    left: 20px;
+    right: 20px;
     border-bottom: 1px solid white;
 }
-
-
