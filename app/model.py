@@ -74,6 +74,7 @@ class User(UserMixin, Document):
     email = db.StringField(required=True, unique=True)
     password = db.StringField(required=True)
     name = db.StringField(required=True)
+    is_admin = db.BooleanField(default=False)  # <-- add this field
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
