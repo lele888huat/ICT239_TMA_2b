@@ -6,6 +6,8 @@ from app.forms import RegistrationForm, LoginForm
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
+from app.forms import NewBookForm
+
 
 # Create Flask app and initialize MongoDB
 app = create_app()
@@ -116,6 +118,45 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('book_titles'))
+
+@app.route('/add_book', methods=['GET', 'POST'])
+def add_book():
+    form = NewBookForm()
+
+    if form.validate_on_submit():
+        # Collect authors, adding "(Illustrator)" if checked
+        authors = []
+        for i in range(1, 6):
+            name = getattr(form, f"author{i}").data
+            if name:
+                if getattr(form, f"illustrator{i}").data:
+                    name += " (Illustrator)"
+                authors.append(name)
+
+        # Description as list (split by lines)
+        description = [line.strip() for line in form.description.data.splitlines() if line.strip()]
+
+        # Genres as list (SelectMultipleField returns a list already)
+        genres = form.genres.data
+
+        # Create and save book
+        book = Book(
+            title=form.title.data,
+            category=form.category.data,
+            genres=genres,
+            url=form.url.data,
+            description=description,
+            authors=authors,
+            pages=form.pages.data,
+            copies=form.copies.data
+        )
+        book.save()
+
+        # Flash message and remain on the same page
+        flash("Book added successfully!", "success")
+        return redirect(url_for('add_book'))  # stay on same page
+
+    return render_template('add_book.html', form=form)
 
 
 if __name__ == '__main__':

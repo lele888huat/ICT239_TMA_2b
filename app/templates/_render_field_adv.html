@@ -1,0 +1,17 @@
+{% macro render_field(field, placeholder='', id='', class_='form-control') %}
+    {# Use **kwargs to pass along attributes like 'multiple' if they exist on the field #}
+    {# Use an if condition for 'select' fields to avoid passing unnecessary placeholder/id #}
+    {% if field.type == 'SelectField' or field.type == 'SelectMultipleField' %}
+        {{ field(class_=class_)|safe }}
+    {% else %}
+        {{ field(class_=class_, placeholder=placeholder, id=id or field.name)|safe }}
+    {% endif %}
+
+    {% if field.errors %}
+      <ul class="mb-0 mt-1" style="color:red;">
+        {% for error in field.errors %}
+          <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+{% endmacro %}

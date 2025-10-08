@@ -9,7 +9,7 @@ class Book(db.Document):
     MongoEngine model for books in the library.
     """
     genres = db.ListField(db.StringField(), required=True)
-    title = db.StringField(required=True, unique=True)
+    title = db.StringField(required=True)
     category = db.StringField(required=True)
     url = db.StringField()
     description = db.ListField(db.StringField()) 

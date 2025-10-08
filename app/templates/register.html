@@ -15,9 +15,9 @@ Register
     </div>
     <div class="card-body">
       <form action="{{ url_for('register') }}" method="post">
-        {{ render_field(form.email, type="email", placeholder="Enter email") }}
-        {{ render_field(form.password, type="password", placeholder="Enter password") }}
-        {{ render_field(form.name, type="text") }} {# No placeholder #}
+        {{ render_field(form.email, placeholder="Enter email") }}
+        {{ render_field(form.password, placeholder="Enter password") }}
+        {{ render_field(form.name) }} {# No placeholder needed #}
         {{ form.hidden_tag() }}
         
         <div class="d-flex justify-content-end mt-3">

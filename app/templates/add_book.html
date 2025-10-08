@@ -1,0 +1,62 @@
+{% from "_render_field_adv.html" import render_field %}
+{% extends "base.html" %}
+
+{% block title %}Add New Book{% endblock %}
+{% block page_heading %}Add New Book{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="book-card p-3 mb-2">
+      <form method="post">
+
+        {# Normal fields with label beside field #}
+        {% for field_name in ['genres', 'title', 'category', 'url', 'description'] %}
+        <div class="row mb-3 align-items-start">
+          <label class="col-sm-2 col-form-label mb-0">{{ form[field_name].label.text }}</label>
+          <div class="col-sm-10">
+            {{ render_field(form[field_name]) }}
+          </div>
+        </div>
+        {% endfor %}
+
+        {% for i in range(1,6) %}
+        <div class="row mb-3 align-items-center">
+            <label class="col-sm-2 col-form-label mb-0">Author {{ i }}</label>
+            <div class="col-sm-10 d-flex align-items-center">
+                
+                <!-- WRAPPER for the Author Input: Takes up remaining space (flex-grow-1) AND adds gap (me-3) -->
+                <div class="flex-grow-1 me-3"> 
+                    {{ render_field(form['author' ~ i], class_="form-control author-input") }}
+                </div>
+                
+                <!-- CHECKBOX CONTAINER: Prevents shrinking (flex-shrink-0) -->
+                <div class="form-check mb-0 d-flex align-items-center flex-shrink-0">
+                    {{ form['illustrator' ~ i](class_="form-check-input") }}
+                    <label class="form-check-label mb-0 ms-1">Illustrator</label>
+                </div>
+                
+            </div>
+        </div>
+        {% endfor %}
+
+
+        {# Pages and Copies fields #}
+        {% for field_name in ['pages', 'copies'] %}
+        <div class="row mb-3 align-items-center">
+          <label class="col-sm-2 col-form-label mb-0">{{ form[field_name].label.text }}</label>
+          <div class="col-sm-10">
+            {{ render_field(form[field_name]) }}
+          </div>
+        </div>
+        {% endfor %}
+
+        {{ form.hidden_tag() }}
+        <div class="d-flex justify-content-end mt-3">
+          <button type="submit" class="btn btn-primary">Add Book</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
