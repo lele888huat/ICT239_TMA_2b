@@ -3,6 +3,7 @@ from app.books import all_books
 from flask_mongoengine import Document
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime,timedelta
 
 class Book(db.Document):
     """
@@ -49,9 +50,10 @@ class Book(db.Document):
     def find_by_title(cls, title):
         """
         Find a single book by title.
+        Returns the Book document (not a dict).
         """
-        book = cls.objects(title=title).first()
-        return book.to_mongo().to_dict() if book else None
+        return cls.objects(title=title).first()
+
 
     @classmethod
     def find_by_category(cls, category):
@@ -101,4 +103,92 @@ class User(UserMixin, Document):
     # Flask-Login needs this to get user by ID
     def get_id(self):
         return str(self.pk)
+
+
+class Loan(db.Document):
+    """
+    MongoEngine model for a user's loan.
+    """
+    member = db.ReferenceField(User, required=True)
+    book = db.ReferenceField(Book, required=True)
+    borrowDate = db.DateTimeField(default=datetime.utcnow)
+    returnDate = db.DateTimeField()
+    renewCount = db.IntField(default=0)
+
+    meta = {'collection': 'loans'}
+
+    # ----------------------------
+    # CREATE a loan
+    # ----------------------------
+    @classmethod
+    def create_loan(cls, member, book):
+        """
+        Create a loan for the member if there is no active (unreturned) loan for the same book.
+        Decrease book.available if loan is successful.
+        """
+        # Check for existing unreturned loan
+        existing_loan = cls.objects(member=member, book=book, returnDate=None).first()
+        if existing_loan:
+            raise ValueError(f"User {member.name} already has an unreturned loan for '{book.title}'.")
+
+        # Check book availability
+        if book.available <= 0:
+            raise ValueError(f"'{book.title}' is currently not available for loan.")
+
+        # Decrease available count
+        book.available -= 1
+        book.save()
+
+        # Create new loan
+        loan = cls(member=member, book=book, borrowDate=datetime.utcnow())
+        loan.save()
+        return loan
+
+    # ----------------------------
+    # RETRIEVE loans
+    # ----------------------------
+    @classmethod
+    def get_member_loans(cls, member):
+        """Retrieve all loans for a given member."""
+        return cls.objects(member=member).order_by('-borrowDate')
+
+    @classmethod
+    def get_specific_loan(cls, member, book):
+        """Retrieve a specific loan (active or returned) for a member and book."""
+        return cls.objects(member=member, book=book).first()
+
+    # ----------------------------
+    # UPDATE loans
+    # ----------------------------
+    def renew_loan(self):
+        """Renew an active loan by updating borrowDate and incrementing renewCount."""
+        if self.returnDate:
+            raise ValueError("Cannot renew a loan that has already been returned.")
+        self.borrowDate = datetime.utcnow()
+        self.renewCount += 1
+        self.save()
+
+    def return_loan(self):
+        """Return a borrowed book, update returnDate, and increase book.available."""
+        if self.returnDate:
+            raise ValueError("Loan has already been returned.")
+        self.returnDate = datetime.utcnow()
+        self.save()
+
+        # Increase available count for the book
+        book = self.book
+        if book.available >= book.copies:
+            raise ValueError(f"All copies of '{book.title}' are already in the library.")
+        book.available += 1
+        book.save()
+
+    # ----------------------------
+    # DELETE loan
+    # ----------------------------
+    def delete_loan(self):
+        """Delete a loan only if it has been returned."""
+        if not self.returnDate:
+            raise ValueError("Cannot delete a loan that has not been returned.")
+        self.delete()
+
 

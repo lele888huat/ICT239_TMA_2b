@@ -52,6 +52,11 @@
                     </a>
                 </li>
                 {% endif %}
+                
+                <a href="{{ url_for('view_loans') }}" class="nav-link">
+                    My Loans
+                </a>
+
 
                 {% if not current_user.is_authenticated %}
                     <li class="{% if request.path == url_for('login') %}active{% endif %}">

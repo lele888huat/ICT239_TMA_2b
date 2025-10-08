@@ -1,14 +1,13 @@
 
 from flask import Flask, render_template, request, flash,redirect, url_for, session
 from app import create_app, db 
-from app.model import Book, User
-from app.forms import RegistrationForm, LoginForm
+from app.model import Book, User, Loan
+from app.forms import RegistrationForm, LoginForm, NewBookForm
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from app.forms import NewBookForm
-
-
+import random
+from datetime import datetime,timedelta
 # Create Flask app and initialize MongoDB
 app = create_app()
 
@@ -159,6 +158,64 @@ def add_book():
         return redirect(url_for('add_book'))  # stay on same page
 
     return render_template('add_book.html', form=form)
+
+
+@app.route('/make_loan/<book_title>')
+def make_loan(book_title):
+    """
+    Allows a non-admin user to borrow a book.
+    If not logged in, flashes a message and redirects to login.
+    """
+    # Check login
+    if not current_user.is_authenticated:
+        flash("Please login or register first to get an account", "warning")
+        return redirect(url_for('login'))
+
+    if current_user.is_admin:
+        flash("Admins cannot borrow books.", "warning")
+        return redirect(url_for('book_titles'))
+
+    # Find the book by title
+    book = Book.find_by_title(book_title)
+    if not book:
+        flash(f"Book '{book_title}' not found.", "danger")
+        return redirect(url_for('book_titles'))
+
+    # Check if the user already has an unreturned loan for this book
+    existing_loan = Loan.objects(member=current_user._get_current_object(), book=book, returnDate=None).first()
+    if existing_loan:
+        flash(f"You already have an unreturned loan for '{book.title}'.", "warning")
+        return redirect(url_for('book_titles'))
+
+    # Check availability
+    if book.available <= 0:   # make sure `book` is an object, not dict
+        flash(f"'{book.title}' is currently not available for loan.", "danger")
+        return redirect(url_for('book_titles'))
+
+    # Generate random borrow date 10 to 20 days before today
+    days_ago = random.randint(10, 20)
+    borrow_date = datetime.utcnow() - timedelta(days=days_ago)
+
+    # Create the loan
+    try:
+        loan = Loan.create_loan(current_user._get_current_object(), book)
+        loan.borrowDate = borrow_date  # set the random borrow date
+        loan.save()
+        flash(f"Loan successful! You borrowed '{book.title}'.", "success")
+    except ValueError as e:
+        flash(str(e), "danger")
+
+    return redirect(url_for('book_titles'))
+
+@app.route('/view_loans')
+@login_required
+def view_loans():
+    if current_user.is_admin:
+        flash("Admins cannot have loans.", "warning")
+        return redirect(url_for('book_titles'))
+
+    loans = Loan.get_member_loans(current_user._get_current_object())
+    return render_template('view_loans.html', loans=loans)
 
 
 if __name__ == '__main__':
