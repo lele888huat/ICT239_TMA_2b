@@ -9,7 +9,8 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
         integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
 
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
 </head>
@@ -52,10 +53,14 @@
                     </a>
                 </li>
                 {% endif %}
-                
-                <a href="{{ url_for('view_loans') }}" class="nav-link">
-                    My Loans
-                </a>
+
+                {% if current_user.is_authenticated and not current_user.is_admin %}
+                    <li class="{% if request.path == url_for('view_loans') %}active{% endif %}">
+                        <a href="{{ url_for('view_loans') }}">
+                            <i class="fas fa-book-reader"></i> My Loans
+                        </a>
+                    </li>
+                {% endif %}
 
 
                 {% if not current_user.is_authenticated %}

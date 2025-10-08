@@ -12,7 +12,7 @@
                 <thead>
                     <tr>
                         <th>Title / Author</th>
-                        <th>Borrow Date</th>
+                        <th>Due Date</th>
                         <th>Return Date</th>
                         <th>Renew Count</th>
                         <th></th> <!-- Actions column -->
@@ -25,7 +25,7 @@
                             {{ loan.book.title }}<br>
                             <small>{{ loan.book.authors|join(', ') }}</small>
                         </td>
-                        <td>{{ loan.borrowDate.strftime("%Y-%m-%d") }}</td>
+                        <td>{{ loan.dueDate.strftime("%Y-%m-%d") }}</td>
                         <td>
                             {% if loan.returnDate %}
                                 {{ loan.returnDate.strftime("%Y-%m-%d") }}
@@ -34,18 +34,28 @@
                             {% endif %}
                         </td>
                         <td>{{ loan.renewCount }}</td>
-                        <td class="d-flex gap-2">
+                        <td>
                             {% if not loan.returnDate %}
-                                <a href="{{ url_for('return_loan', loan_id=loan.id) }}" class="btn btn-sm btn-danger">
-                                    Return
-                                </a>
-                                <a href="{{ url_for('renew_loan', loan_id=loan.id) }}" class="btn btn-sm btn-warning">
-                                    Renew
-                                </a>
+                                <div class="d-flex">
+                                    {% if loan.renewCount < 2 and loan.dueDate >= now %}
+                                        <form method="POST" action="{{ url_for('renew_loan', loan_id=loan.id) }}" class="mr-2">
+                                            <button type="submit" class="btn btn-sm btn-success">Renew</button>
+                                        </form>
+                                    {% endif %}
+                                    <form method="POST" action="{{ url_for('return_loan', loan_id=loan.id) }}">
+                                        <button type="submit" class="btn btn-sm btn-success">Return</button>
+                                    </form>
+                                </div>
                             {% else %}
-                                <span class="text-muted">Completed</span>
+                                <form method="POST" action="{{ url_for('delete_loan', loan_id=loan.id) }}">
+                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                </form>
                             {% endif %}
                         </td>
+
+
+
+
                     </tr>
                     {% endfor %}
                 </tbody>

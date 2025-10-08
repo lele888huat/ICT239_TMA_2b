@@ -104,6 +104,8 @@ class User(UserMixin, Document):
     def get_id(self):
         return str(self.pk)
 
+from datetime import datetime, timedelta
+from mongoengine import *
 
 class Loan(db.Document):
     """
@@ -112,6 +114,7 @@ class Loan(db.Document):
     member = db.ReferenceField(User, required=True)
     book = db.ReferenceField(Book, required=True)
     borrowDate = db.DateTimeField(default=datetime.utcnow)
+    dueDate = db.DateTimeField()  # NEW FIELD for VIEWLOAN
     returnDate = db.DateTimeField()
     renewCount = db.IntField(default=0)
 
@@ -121,11 +124,15 @@ class Loan(db.Document):
     # CREATE a loan
     # ----------------------------
     @classmethod
-    def create_loan(cls, member, book):
+    def create_loan(cls, member, book, borrow_date=None):
         """
         Create a loan for the member if there is no active (unreturned) loan for the same book.
         Decrease book.available if loan is successful.
+        borrow_date: optional datetime for random borrow date
         """
+        if borrow_date is None:
+            borrow_date = datetime.utcnow()  
+
         # Check for existing unreturned loan
         existing_loan = cls.objects(member=member, book=book, returnDate=None).first()
         if existing_loan:
@@ -139,10 +146,14 @@ class Loan(db.Document):
         book.available -= 1
         book.save()
 
+        # Set due date 2 weeks after borrow date
+        due_date = borrow_date + timedelta(weeks=2)
+
         # Create new loan
-        loan = cls(member=member, book=book, borrowDate=datetime.utcnow())
+        loan = cls(member=member, book=book, borrowDate=borrow_date, dueDate=due_date)
         loan.save()
         return loan
+
 
     # ----------------------------
     # RETRIEVE loans
@@ -161,10 +172,12 @@ class Loan(db.Document):
     # UPDATE loans
     # ----------------------------
     def renew_loan(self):
-        """Renew an active loan by updating borrowDate and incrementing renewCount."""
+        """Renew an active loan by updating borrowDate, dueDate, and incrementing renewCount."""
         if self.returnDate:
             raise ValueError("Cannot renew a loan that has already been returned.")
+
         self.borrowDate = datetime.utcnow()
+        self.dueDate = self.borrowDate + timedelta(weeks=2)  # extend by another 2 weeks VIEWLOAN
         self.renewCount += 1
         self.save()
 
@@ -190,5 +203,3 @@ class Loan(db.Document):
         if not self.returnDate:
             raise ValueError("Cannot delete a loan that has not been returned.")
         self.delete()
-
-

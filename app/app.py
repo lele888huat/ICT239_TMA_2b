@@ -159,14 +159,8 @@ def add_book():
 
     return render_template('add_book.html', form=form)
 
-
 @app.route('/make_loan/<book_title>')
 def make_loan(book_title):
-    """
-    Allows a non-admin user to borrow a book.
-    If not logged in, flashes a message and redirects to login.
-    """
-    # Check login
     if not current_user.is_authenticated:
         flash("Please login or register first to get an account", "warning")
         return redirect(url_for('login'))
@@ -175,33 +169,28 @@ def make_loan(book_title):
         flash("Admins cannot borrow books.", "warning")
         return redirect(url_for('book_titles'))
 
-    # Find the book by title
     book = Book.find_by_title(book_title)
     if not book:
         flash(f"Book '{book_title}' not found.", "danger")
         return redirect(url_for('book_titles'))
 
-    # Check if the user already has an unreturned loan for this book
+    # Check if user already has unreturned loan for this book
     existing_loan = Loan.objects(member=current_user._get_current_object(), book=book, returnDate=None).first()
     if existing_loan:
         flash(f"You already have an unreturned loan for '{book.title}'.", "warning")
         return redirect(url_for('book_titles'))
 
-    # Check availability
-    if book.available <= 0:   # make sure `book` is an object, not dict
+    if book.available <= 0:
         flash(f"'{book.title}' is currently not available for loan.", "danger")
         return redirect(url_for('book_titles'))
 
-    # Generate random borrow date 10 to 20 days before today
+    # Random borrow date 10–20 days ago
     days_ago = random.randint(10, 20)
     borrow_date = datetime.utcnow() - timedelta(days=days_ago)
 
-    # Create the loan
     try:
-        loan = Loan.create_loan(current_user._get_current_object(), book)
-        loan.borrowDate = borrow_date  # set the random borrow date
-        loan.save()
-        flash(f"Loan successful! You borrowed '{book.title}'.", "success")
+        loan = Loan.create_loan(current_user._get_current_object(), book, borrow_date=borrow_date)
+        flash(f"Loan successful! You borrowed '{book.title}'. Due date: {loan.dueDate.strftime('%Y-%m-%d')}", "success")
     except ValueError as e:
         flash(str(e), "danger")
 
@@ -215,7 +204,68 @@ def view_loans():
         return redirect(url_for('book_titles'))
 
     loans = Loan.get_member_loans(current_user._get_current_object())
-    return render_template('view_loans.html', loans=loans)
+    return render_template('view_loans.html', loans=loans, now=datetime.utcnow())
+
+@app.route('/return_loan/<loan_id>', methods=['POST'])
+@login_required
+def return_loan(loan_id):
+    """Handle returning a borrowed book."""
+    try:
+        loan = Loan.objects.get(id=loan_id, member=current_user)
+        loan.return_loan()
+        flash(f"You have successfully returned '{loan.book.title}'.", "success")
+    except Loan.DoesNotExist:
+        flash("Loan not found or unauthorized.", "danger")
+    except ValueError as e:
+        flash(str(e), "danger")
+
+    return redirect(url_for('view_loans'))
+
+
+@app.route('/renew_loan/<loan_id>', methods=['POST'])
+@login_required
+def renew_loan(loan_id):
+    """Handle renewing a borrowed book (extends due date by 2 weeks, max 2 renewals)."""
+    if current_user.is_admin:
+        flash("Admins cannot renew loans.", "warning")
+        return redirect(url_for('book_titles'))
+
+    loan = Loan.objects(id=loan_id, member=current_user._get_current_object()).first()
+    if not loan:
+        flash("Loan not found or unauthorized.", "danger")
+        return redirect(url_for('view_loans'))
+
+    try:
+        loan.renew_loan()
+        flash(f"'{loan.book.title}' renewed successfully! New due date: {loan.dueDate.strftime('%Y-%m-%d')}.", "success")
+    except ValueError as e:
+        flash(str(e), "danger")
+
+    return redirect(url_for('view_loans'))
+
+
+@app.route('/delete_loan/<loan_id>', methods=['POST'])
+@login_required
+def delete_loan(loan_id):
+    """Delete a returned loan from the database."""
+    if current_user.is_admin:
+        flash("Admins cannot delete loans.", "warning")
+        return redirect(url_for('book_titles'))
+
+    # Fetch loan belonging to the current user
+    loan = Loan.objects(id=loan_id, member=current_user._get_current_object()).first()
+    if not loan:
+        flash("Loan not found or unauthorized.", "danger")
+        return redirect(url_for('view_loans'))
+
+    try:
+        # Use the Loan model method
+        loan.delete_loan()
+        flash(f"Loan for '{loan.book.title}' has been deleted.", "success")
+    except ValueError as e:
+        flash(str(e), "warning")
+
+    return redirect(url_for('view_loans'))
 
 
 if __name__ == '__main__':
