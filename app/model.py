@@ -63,6 +63,22 @@ class Book(db.Document):
             
         #sorting by title 
         return list(cls.objects(category=category).order_by('title').as_pymongo())
+
+        # --- METHOD 1: Borrow a book ---
+    def borrow(self):
+        """Decreases available count when a book is borrowed."""
+        if self.available <= 0:
+            raise ValueError(f"'{self.title}' is currently not available for loan.")
+        self.available -= 1
+        self.save()
+
+    # --- METHOD 2: Return a book ---
+    def return_book(self):
+        """Increases available count when a book is returned."""
+        if self.available >= self.copies:
+            raise ValueError(f"All copies of '{self.title}' are already in the library.")
+        self.available += 1
+        self.save()
     
 
 

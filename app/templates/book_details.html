@@ -65,16 +65,27 @@ Book Details
                     <p class="text-muted">{{ paragraph }}</p>
                     {% endfor %}
 
-                    {# 7. Back Button #}
-                    <div class="mt-4 text-right">
+                    <!-- 7. Back Button and Conditional Loan/Availability -->
+                    <div class="mt-4 text-right d-flex justify-content-end">
                         <a href="{{ url_for('book_titles') }}" class="btn btn-sm btn-info">
                             Back to Book Titles
                         </a>
+
+                        {% if book.available > 0 %}
+                            <a href="{{ url_for('book_titles', book_title=book.title) }}" class="btn btn-sm btn-success ml-2">
+                                Make a Loan
+                            </a>
+                        {% else %}
+                            <button type="button" class="btn btn-sm btn-danger ml-2" disabled>
+                                Not Available
+                            </button>
+                        {% endif %}
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
 {% endblock %}

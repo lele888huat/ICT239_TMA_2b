@@ -148,7 +148,9 @@ def add_book():
             description=description,
             authors=authors,
             pages=form.pages.data,
-            copies=form.copies.data
+            copies=form.copies.data,
+            available=form.copies.data  # <-- set available to same as copies
+
         )
         book.save()
 

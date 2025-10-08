@@ -90,11 +90,17 @@ Book Titles
                     <p class="text-muted flex-grow-1">{{ book.description[0] }}</p>
                     {% endif %}
 
-                    <div class="mt-2 text-right mt-auto">
+                    <div class="mt-2 text-right mt-auto d-flex justify-content-end">
+                        {% if book.available > 0 %}
+                            <a href="{{ url_for('book_details', book_title=book.title) }}" class="btn btn-sm btn-success mr-2">
+                                Make a Loan
+                            </a>
+                        {% endif %}
                         <a href="{{ url_for('book_details', book_title=book.title) }}" class="btn btn-sm btn-info">
                             More Details
                         </a>
                     </div>
+
                 </div>
             </div>
         </div>
