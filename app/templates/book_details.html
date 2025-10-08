@@ -72,7 +72,7 @@ Book Details
                         </a>
 
                         {% if book.available > 0 %}
-                            <a href="{{ url_for('book_titles', book_title=book.title) }}" class="btn btn-sm btn-success ml-2">
+                            <a href="{{ url_for('make_loan', book_title=book.title) }}" class="btn btn-sm btn-success ml-2">
                                 Make a Loan
                             </a>
                         {% else %}
