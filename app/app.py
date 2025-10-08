@@ -14,9 +14,6 @@ app = create_app()
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'login'  
-login_manager.login_message = "Please login/register to continue!"
-login_manager.login_message_category = "warning"
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -88,7 +85,6 @@ def register():
         )
         new_user.set_password(form.password.data)
         new_user.save()
-        flash(f"Registration successful for {form.email.data}!", "success")
         return redirect(url_for('login'))
 
     return render_template('register.html', form=form)
@@ -109,7 +105,6 @@ def login():
             return render_template("login.html", form=form)
         
         login_user(user, remember=form.remember.data)
-        flash(f"Welcome {user.name}!", "success")
         return redirect(url_for('book_titles'))
 
     return render_template("login.html", form=form)
@@ -120,7 +115,6 @@ def login():
 @login_required
 def logout():
     logout_user()
-    flash("You have been logged out.", "info")
     return redirect(url_for('book_titles'))
 
 
