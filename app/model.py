@@ -4,6 +4,7 @@ from flask_mongoengine import Document
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime,timedelta
+import random
 
 class Book(db.Document):
     """
@@ -172,23 +173,37 @@ class Loan(db.Document):
     # UPDATE loans
     # ----------------------------
     def renew_loan(self):
-        """Renew an active loan by updating borrowDate, dueDate, and incrementing renewCount."""
+        """Renew an active loan by generating a new borrow date 10–20 days after current borrow date."""
         if self.returnDate:
             raise ValueError("Cannot renew a loan that has already been returned.")
+        if self.renewCount >= 2:
+            raise ValueError("Cannot renew loan more than 2 times.")
 
-        self.borrowDate = datetime.utcnow()
-        self.dueDate = self.borrowDate + timedelta(weeks=2)  # extend by another 2 weeks VIEWLOAN
+        # Generate a random new borrow date (10–20 days after current borrow date, not after today)
+        days_after = random.randint(10, 20)
+        new_borrow_date = self.borrowDate + timedelta(days=days_after)
+        if new_borrow_date > datetime.utcnow():
+            new_borrow_date = datetime.utcnow()
+
+        self.borrowDate = new_borrow_date
+        self.dueDate = self.borrowDate + timedelta(weeks=2)
         self.renewCount += 1
         self.save()
 
     def return_loan(self):
-        """Return a borrowed book, update returnDate, and increase book.available."""
+        """Return a borrowed book by setting returnDate 10–20 days after borrowDate, capped at today."""
         if self.returnDate:
             raise ValueError("Loan has already been returned.")
-        self.returnDate = datetime.utcnow()
+
+        # Generate a random return date (10–20 days after borrow date, not after today)
+        days_after = random.randint(10, 20)
+        random_return_date = self.borrowDate + timedelta(days=days_after)
+        if random_return_date > datetime.utcnow():
+            random_return_date = datetime.utcnow()
+
+        self.returnDate = random_return_date
         self.save()
 
-        # Increase available count for the book
         book = self.book
         if book.available >= book.copies:
             raise ValueError(f"All copies of '{book.title}' are already in the library.")
