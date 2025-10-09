@@ -227,6 +227,10 @@ body {
    Responsive: Hamburger Menu & Sidebar (<768px)
    ================================ */
 @media (max-width: 768px) {
+    :root {
+    --mobile-sidebar-height: 200px; /* match the expanded height */
+    }
+
 
     /* Hamburger toggle */
     #sidebar-label {
@@ -299,7 +303,7 @@ body {
         display: flex !important; 
         left: 0; 
         width: 100vw;
-        top: 160px; 
+        top: 200px; 
         transition: top 0.3s ease;
     }
 
@@ -312,7 +316,7 @@ body {
     }
 
     #sidebar-toggle:checked ~ .wrapper #content .main-content-area {
-        padding-top: 215px; 
+        padding-top: 265px; 
     }
 }
 
@@ -348,6 +352,15 @@ body {
 }
 
 
+
+
+/* view loan image */
+.book-loan-cover {
+    width: 40px;      /* small width */
+    height: auto;     /* maintain aspect ratio */
+    display: block;   /* ensure it stays above the title */
+    margin-bottom: 4px; /* small gap under the image */
+}
 
 
 

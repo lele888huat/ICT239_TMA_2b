@@ -2,10 +2,7 @@
 {% extends "base.html" %}
 
 {% block title %}Login{% endblock %}
-
-{% block page_heading %}
-Login
-{% endblock %}
+{% block page_heading %}Login{% endblock %}
 
 {% block content %}
 <div class="col-xl-6 col-sm-4 p-2">
@@ -16,7 +13,7 @@ Login
     <div class="card-body">
       <form action="{{ url_for('login') }}" method="post">
         {{ render_field(form.email, placeholder="Enter email") }}
-        {{ render_field(form.password, placeholder="Enter password") }}
+        {{ render_field(form.password, placeholder="Enter password", type="password") }}
         {{ form.hidden_tag() }}
         
         <div class="form-group form-check mb-3">

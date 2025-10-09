@@ -1,10 +1,15 @@
-{% macro render_field(field, type='text', placeholder='', id='') %}
+{% macro render_field(field, type=None, placeholder='', id='') %}
 <div class="form-group">
     <label for="{{ id or field.name }}">
         <h5>{{ field.label.text.capitalize() }}</h5>
     </label>
-    {{ field(class_='form-control', type=type, placeholder=placeholder, id=id or field.name)|safe }}
-    <ul> 
+    {# Use the field type if specified, otherwise default to HTML type based on field #}
+    {% if type %}
+        {{ field(class_='form-control', type=type, placeholder=placeholder, id=id or field.name)|safe }}
+    {% else %}
+        {{ field(class_='form-control', placeholder=placeholder, id=id or field.name)|safe }}
+    {% endif %}
+    <ul class="mt-1">
         {% for error in field.errors %}
         <li style="color:red;">{{ error }}</li>
         {% endfor %}
