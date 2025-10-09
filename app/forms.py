@@ -46,7 +46,7 @@ class NewBookForm(FlaskForm):
     copies = IntegerField("Number of Copies:", validators=[DataRequired(), NumberRange(min=1)])
     
     # Authors & Illustrator checkboxes
-    author1 = StringField("Author 1:", validators=[DataRequired()])
+    author1 = StringField("Author 1:")
     illustrator1 = BooleanField("Illustrator")
     author2 = StringField("Author 2:")
     illustrator2 = BooleanField("Illustrator")
@@ -56,4 +56,23 @@ class NewBookForm(FlaskForm):
     illustrator4 = BooleanField("Illustrator")
     author5 = StringField("Author 5:")
     illustrator5 = BooleanField("Illustrator")
+        
+    def validate(self, extra_validators=None):
+        # Run the default validations first
+        if not super().validate(extra_validators=extra_validators):
+            return False
+
+        # Check that at least one author field is filled
+        authors = [
+            (self.author1.data or "").strip(),
+            (self.author2.data or "").strip(),
+            (self.author3.data or "").strip(),
+            (self.author4.data or "").strip(),
+            (self.author5.data or "").strip(),
+        ]
+        if not any(authors):
+            self.author1.errors.append("At least one author is required.")
+            return False
+
+        return True
 
