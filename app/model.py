@@ -5,6 +5,8 @@ from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime,timedelta
 import random
+from datetime import datetime, timedelta
+from mongoengine import *
 
 class Book(db.Document):
     """
@@ -105,8 +107,6 @@ class User(UserMixin, Document):
     def get_id(self):
         return str(self.pk)
 
-from datetime import datetime, timedelta
-from mongoengine import *
 
 class Loan(db.Document):
     """

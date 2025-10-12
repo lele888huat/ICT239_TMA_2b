@@ -1,0 +1,6 @@
+How to run Flask App
+1. Open a terminal in the project folder (the folder containing app folder, start.sh and requirements.txt)
+2. Project Folder is named TMAqn2_voc
+3. Run command "mongosh "mongodb://localhost:27017" to check connection to MongoDB, can 'exit' shell once confirmed
+3. Run the app by running the command "sh start.sh" in the project folder terminal, Flask App should connect to MongoDB
+4. Head to Vocaruem flask_browser to view flask app.
