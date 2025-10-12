@@ -5,5 +5,5 @@ How to run Flask App
 3. Run the app by running the command "sh start.sh" in the project folder terminal, Flask App should connect to MongoDB
 4. Head to Vocaruem flask_browser to view flask app.
 
-Sidenote:
+Sidenote(For Register/Login):
 After a user registers in the Flask app, their admin status is not assigned automatically. Web admins can manually set a user as an admin directly in MongoDB for enhanced security.
