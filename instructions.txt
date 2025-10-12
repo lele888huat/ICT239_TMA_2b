@@ -4,3 +4,6 @@ How to run Flask App
 3. Run command "mongosh "mongodb://localhost:27017" to check connection to MongoDB, can 'exit' shell once confirmed
 3. Run the app by running the command "sh start.sh" in the project folder terminal, Flask App should connect to MongoDB
 4. Head to Vocaruem flask_browser to view flask app.
+
+Sidenote:
+After a user registers in the Flask app, their admin status is not assigned automatically. Web admins can manually set a user as an admin directly in MongoDB for enhanced security.
